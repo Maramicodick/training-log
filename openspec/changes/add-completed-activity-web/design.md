@@ -7,7 +7,7 @@ See `proposal.md` for motivation. The repo has no application code yet. v1 is a 
 **Goals:**
 
 - ASP.NET Core JSON API as the only backend; Vue 3 SPA as the PC UI.
-- A shared C# contracts project (DTOs / validation rules) that a future MAUI app can reference without taking a UI or Vue dependency.
+- One ASP.NET Core project for the API and persistence. Split out shared C# libraries only if MAUI later needs them.
 - In production, one process: the API host serves the built Vue files.
 - SQL Server persistence (connection string in config) so the same engine can stay when the app grows.
 
@@ -47,18 +47,18 @@ Keep the path and payload stable so MAUI can call it unchanged.
 ### 4. Solution layout
 
 ```
-src/
-  TrackingApp.Contracts/     DTOs + shared C# validation (API + future MAUI)
-  TrackingApp.App/           domain + SQL Server persistence
-  TrackingApp.Web/           ASP.NET Core API host; serves Vue dist in production
-  TrackingApp.Web.Client/    Vue 3 + Vite + TypeScript SPA
+TrackingApp.sln
+TrackingApp.Backend/     ASP.NET Core API + SQL Server (one C# project)
+frontend/                Vue 3 + Vite + TypeScript (later; Vue's own src/ stays inside this folder)
 ```
 
-EF Core + SQL Server. Date stored as a calendar `date` (not a UTC instant) because v1 has no time-of-day. Vue keeps a small TypeScript type for the activity JSON; no OpenAPI codegen in v1.
+No repo-root `src/` folder — that name is reserved for Vue sources under `frontend/src`.
 
-Default local connection: SQL Server LocalDB (`(localdb)\\mssqllocaldb`) and a dedicated database name. Override via connection string for full SQL Server, Express, Docker, or a remote instance. Apply migrations on startup in Development (or document `dotnet ef database update`).
+EF Core + SQL Server live in `TrackingApp.Backend`. Date stored as a calendar `date` (not a UTC instant) because v1 has no time-of-day. Vue keeps a small TypeScript type for the activity JSON; no OpenAPI codegen in v1.
 
-**Alternatives considered:** SQLite (zero install; rejected — user wants MSSQL); one C# project only; Blazor host (rejected); separate production UI host.
+Default local connection: SQL Server LocalDB (`(localdb)\\mssqllocaldb`) and a dedicated database name. Database files may live under `E:\Database`. Override via connection string for full SQL Server, Express, Docker, or a remote instance. Apply migrations on startup in Development (or document `dotnet ef database update`).
+
+**Alternatives considered:** SQLite (zero install; rejected — user wants MSSQL); three C# projects under `src/` (rejected — too much structure for v1); Blazor host (rejected); separate production UI host.
 
 ### 5. Single-user, no auth
 

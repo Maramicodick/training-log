@@ -21,6 +21,6 @@ There is no way yet to record trainings that already happened. The first useful 
 
 ## Impact
 
-- New solution (empty repo today): ASP.NET Core HTTP JSON API, SQL Server, Vue 3 web UI, C# contracts for a later MAUI client. The Vue app does not share UI with MAUI.
+- New solution: one ASP.NET Core project (`TrackingApp.Backend`) for the HTTP JSON API and SQL Server; Vue 3 UI later in `frontend/`. The Vue app does not share UI with MAUI.
 - No auth, no multi-user accounts, no MAUI project, no planned-workout type in this change.
 - Phone remains out of scope; the web app may still be opened in a mobile browser, but that is not a supported target yet.

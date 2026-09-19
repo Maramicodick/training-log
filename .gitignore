@@ -1,0 +1,7 @@
+# Personal IDE / agent preferences (keep OpenSpec skills and commands tracked)
+.cursor/rules/
+.vscode/
+
+# Build output
+bin/
+obj/
