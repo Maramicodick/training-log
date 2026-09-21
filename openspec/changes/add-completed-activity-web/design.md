@@ -37,7 +37,7 @@ Dev: Vite dev server with a proxy to the API. Prod: `npm run build` output copie
 ### 3. JSON API shape
 
 - `GET /api/activities` — list, date descending, then most recently added.
-- `POST /api/activities` — create `{ date, title, notes? }`; `400` on validation failure with field errors.
+- `POST /api/activities` — create `{ date, title, notes? }`; `400` with a text message on validation failure.
 - Each activity has a server-generated id (GUID) for later edit/delete without putting those operations in v1 UI.
 
 Keep the path and payload stable so MAUI can call it unchanged.

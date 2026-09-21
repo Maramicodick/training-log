@@ -11,11 +11,13 @@ public class ActivityServiceTests
         return new ActivityService(new TrackingDbContext(options));
     }
 
-    [Fact]
-    public async Task CreateAsync_EmptyTitle_Throws()
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task CreateAsync_EmptyOrWhitespaceTitle_Throws(string title)
     {
         var service = CreateService();
-        var request = new CreateActivityRequest { Date = new DateOnly(2026, 1, 1), Title = "   " };
+        var request = new CreateActivityRequest { Date = new DateOnly(2026, 1, 1), Title = title };
 
         await Assert.ThrowsAsync<ArgumentException>(() => service.CreateAsync(request));
     }
