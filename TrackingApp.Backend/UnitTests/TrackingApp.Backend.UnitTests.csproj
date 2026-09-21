@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TrackingApp.Backend\TrackingApp.Backend.csproj" />
+    <ProjectReference Include="..\TrackingApp.Backend.csproj" />
   </ItemGroup>
 
   <ItemGroup>

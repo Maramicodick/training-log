@@ -5,3 +5,5 @@
 # Build output
 bin/
 obj/
+node_modules/
+TrackingApp.Backend/wwwroot/

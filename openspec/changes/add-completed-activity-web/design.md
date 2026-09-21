@@ -48,11 +48,12 @@ Keep the path and payload stable so MAUI can call it unchanged.
 
 ```
 TrackingApp.sln
-TrackingApp.Backend/     ASP.NET Core API + SQL Server (one C# project)
-frontend/                Vue 3 + Vite + TypeScript (later; Vue's own src/ stays inside this folder)
+TrackingApp.Backend/              ASP.NET Core API + SQL Server
+TrackingApp.Backend/UnitTests/    xUnit + EF InMemory (own csproj)
+TrackingApp.Frontend/             Vue 3 + Vite + TypeScript (Vue's own src/ stays inside this folder)
 ```
 
-No repo-root `src/` folder — that name is reserved for Vue sources under `frontend/src`.
+No repo-root `src/` folder — that name is reserved for Vue sources under `TrackingApp.Frontend/src`.
 
 EF Core + SQL Server live in `TrackingApp.Backend`. Date stored as a calendar `date` (not a UTC instant) because v1 has no time-of-day. Vue keeps a small TypeScript type for the activity JSON; no OpenAPI codegen in v1.
 
