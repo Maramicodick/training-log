@@ -4,7 +4,7 @@ A completed activity is only a date, title, and notes. TrainingPeaks and Garmin 
 
 ## What Changes
 
-- Add optional sport, duration, and distance on a completed activity. Existing activities stay valid without them.
+- Add a required sport, plus optional duration and distance, on a completed activity. The form asks for the sport first.
 - Sport is one of Run, RoadRide, Swim, Strength, or Other. RoadRide means road cycling. Other cycling types can be added later as their own values.
 - Duration is whole minutes and must be greater than zero when present.
 - Distance is kilometers and must be greater than zero when present.
@@ -20,7 +20,7 @@ A completed activity is only a date, title, and notes. TrainingPeaks and Garmin 
 
 ### Modified Capabilities
 
-- `completed-activities`: Logging, listing, persistence, and the HTTP API gain optional sport, duration, and distance, and a saved activity can be updated.
+- `completed-activities`: Logging, listing, persistence, and the HTTP API gain a required sport plus optional duration and distance, and a saved activity can be updated.
 
 ## Impact
 

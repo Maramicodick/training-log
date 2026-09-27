@@ -7,7 +7,7 @@ Lets the user record trainings that already happened and review them later, as c
 
 ### Requirement: User can log a completed activity
 
-The system SHALL allow the user to record a completed activity with a date, a title, and optional notes. The system SHALL NOT represent an activity as planned or completed via a status field. Title MUST be non-empty after trimming whitespace. Date MUST be present.
+The system SHALL allow the user to record a completed activity with a date, a title, a sport, and optional notes, duration, and distance. The system SHALL NOT represent an activity as planned or completed via a status field. Title MUST be non-empty after trimming whitespace. Date MUST be present. Sport MUST be one of Run, RoadRide, Swim, Strength, or Other. RoadRide means road cycling. Duration, when present, MUST be a whole number of minutes greater than zero. Distance, when present, MUST be a number of kilometers greater than zero.
 
 #### Scenario: Log activity with all fields
 
@@ -33,9 +33,27 @@ The system SHALL allow the user to record a completed activity with a date, a ti
 - **WHEN** they have not changed the date
 - **THEN** the date is today's local date
 
+#### Scenario: Log sport, duration, and distance
+
+- **GIVEN** the user is adding a completed activity
+- **WHEN** they submit a date, a non-empty title, sport Run, duration 45 minutes, and distance 8 kilometers
+- **THEN** the activity is stored and appears in the list with those values
+
+#### Scenario: Log without duration or distance
+
+- **GIVEN** the user is adding a completed activity
+- **WHEN** they submit a date, a non-empty title, and a sport, and leave duration and distance empty
+- **THEN** the activity is stored and appears in the list with that sport and without duration or distance
+
+#### Scenario: Reject missing or invalid sport, duration, or distance
+
+- **GIVEN** the user is adding a completed activity
+- **WHEN** they omit the sport, submit a sport outside the allowed set, a duration that is not a positive whole number of minutes, or a distance that is not a positive number of kilometers
+- **THEN** the activity is not stored and the user is shown what was rejected
+
 ### Requirement: User can view completed activities
 
-The system SHALL show stored completed activities in a list ordered by date descending (newest date first). Activities with the same date SHALL appear with the most recently added first.
+The system SHALL show stored completed activities in a list ordered by date descending (newest date first). Activities with the same date SHALL appear with the most recently added first. Each activity SHALL show its date, title, and sport, notes when notes exist, and duration and distance when those values exist.
 
 #### Scenario: Empty list
 
@@ -49,9 +67,15 @@ The system SHALL show stored completed activities in a list ordered by date desc
 - **WHEN** the user opens the activity list
 - **THEN** each activity shows date, title, and notes (if any), ordered by date descending
 
+#### Scenario: Activity with sport, duration, and distance
+
+- **GIVEN** a completed activity has sport, duration, and distance
+- **WHEN** the user opens the activity list
+- **THEN** that activity shows those values along with its date and title
+
 ### Requirement: Completed activities persist
 
-The system SHALL persist completed activities so they remain available after the application is restarted.
+The system SHALL persist completed activities so they remain available after the application is restarted, including sport, duration, and distance when they were set.
 
 #### Scenario: Restart after logging
 
@@ -59,9 +83,15 @@ The system SHALL persist completed activities so they remain available after the
 - **WHEN** the application is restarted
 - **THEN** those activities still appear in the list with the same date, title, and notes
 
+#### Scenario: Restart keeps sport, duration, and distance
+
+- **GIVEN** the user has logged a completed activity with sport, duration, and distance
+- **WHEN** the application is restarted
+- **THEN** that activity still shows the same sport, duration, and distance
+
 ### Requirement: HTTP API for completed activities
 
-The system SHALL expose an HTTP JSON API that can list completed activities and create a completed activity with date, title, and optional notes. Create MUST apply the same validation as the web form (non-empty title, date required). The API exists so a future native client can use the same contract.
+The system SHALL expose an HTTP JSON API that can list completed activities, create a completed activity, and update a completed activity. Create and update accept date, title, sport, optional notes, optional duration, and optional distance. Create and update MUST apply the same validation (non-empty title, date required, sport required, and the duration and distance rules). The API exists so a future native client can use the same contract.
 
 #### Scenario: Create via API
 
@@ -74,3 +104,37 @@ The system SHALL expose an HTTP JSON API that can list completed activities and 
 - **GIVEN** stored completed activities
 - **WHEN** a client requests the activity list through the API
 - **THEN** the response includes those activities ordered by date descending
+
+#### Scenario: Create with sport, duration, and distance via API
+
+- **GIVEN** a valid JSON body with date, non-empty title, sport, duration, and distance
+- **WHEN** a client creates a completed activity through the API
+- **THEN** a subsequent list response includes those values for that activity
+
+#### Scenario: Reject invalid body via API
+
+- **GIVEN** a JSON body with a whitespace title, a missing sport, a sport outside the allowed set, a non-positive duration, or a non-positive distance
+- **WHEN** a client creates or updates a completed activity through the API
+- **THEN** the API responds with 400 and a text message, and the stored activities are unchanged
+
+### Requirement: User can edit a saved completed activity
+
+The system SHALL allow the user to change the date, title, notes, sport, duration, and distance of a saved completed activity. Title, date, and sport rules MUST still apply. The user MUST be able to clear duration and distance. After a successful edit, the list SHALL show the updated values.
+
+#### Scenario: Edit saved fields
+
+- **GIVEN** a saved completed activity
+- **WHEN** the user changes its title, date, notes, sport, duration, and distance to valid values and saves
+- **THEN** the list shows the new values
+
+#### Scenario: Clear duration and distance
+
+- **GIVEN** a saved completed activity that has duration and distance
+- **WHEN** the user clears those two fields and saves a valid sport
+- **THEN** the list shows the activity with its sport and without duration or distance
+
+#### Scenario: Reject invalid edit
+
+- **GIVEN** a saved completed activity
+- **WHEN** the user saves a whitespace title, a missing sport, a sport outside the allowed set, a non-positive duration, or a non-positive distance
+- **THEN** the activity is unchanged and the user is shown what was rejected

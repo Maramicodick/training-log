@@ -39,6 +39,17 @@ public class ActivityService : IActivityService
             throw new ArgumentException("A date is required.");
         }
 
+        var sport = ParseSport(request.Sport);
+        if (request.DurationMinutes is <= 0)
+        {
+            throw new ArgumentException("Duration must be a positive number of minutes.");
+        }
+
+        if (request.DistanceKilometers is <= 0)
+        {
+            throw new ArgumentException("Distance must be a positive number of kilometers.");
+        }
+
         var now = DateTime.UtcNow;
         var activity = new Activity
         {
@@ -46,6 +57,9 @@ public class ActivityService : IActivityService
             Date = request.Date,
             Title = title,
             Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
+            Sport = sport,
+            DurationMinutes = request.DurationMinutes,
+            DistanceKilometers = request.DistanceKilometers,
             CreatedAt = now,
             UpdatedAt = now
         };
@@ -68,14 +82,44 @@ public class ActivityService : IActivityService
             throw new ArgumentException("A date is required.");
         }
 
+        var sport = ParseSport(request.Sport);
+        if (request.DurationMinutes is <= 0)
+        {
+            throw new ArgumentException("Duration must be a positive number of minutes.");
+        }
+
+        if (request.DistanceKilometers is <= 0)
+        {
+            throw new ArgumentException("Distance must be a positive number of kilometers.");
+        }
+
         var activity = await GetActivityAsync(id);
 
         activity.Date = request.Date;
         activity.Title = title;
         activity.Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim();
+        activity.Sport = sport;
+        activity.DurationMinutes = request.DurationMinutes;
+        activity.DistanceKilometers = request.DistanceKilometers;
         activity.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+    }
+
+    private static ActivityType ParseSport(string? sport)
+    {
+        if (string.IsNullOrWhiteSpace(sport))
+        {
+            throw new ArgumentException("A sport is required.");
+        }
+
+        var name = sport.Trim();
+        if (!Enum.TryParse(name, ignoreCase: false, out ActivityType parsed) || parsed.ToString() != name)
+        {
+            throw new ArgumentException("Sport must be Run, RoadRide, Swim, Strength, or Other.");
+        }
+
+        return parsed;
     }
 
     public async Task DeleteAsync(Guid id)

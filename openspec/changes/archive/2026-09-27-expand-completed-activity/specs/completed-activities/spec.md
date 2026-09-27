@@ -2,7 +2,7 @@
 
 ### Requirement: User can log a completed activity
 
-The system SHALL allow the user to record a completed activity with a date, a title, and optional notes, sport, duration, and distance. The system SHALL NOT represent an activity as planned or completed via a status field. Title MUST be non-empty after trimming whitespace. Date MUST be present. Sport, when present, MUST be one of Run, RoadRide, Swim, Strength, or Other. RoadRide means road cycling. Duration, when present, MUST be a whole number of minutes greater than zero. Distance, when present, MUST be a number of kilometers greater than zero.
+The system SHALL allow the user to record a completed activity with a date, a title, a sport, and optional notes, duration, and distance. The system SHALL NOT represent an activity as planned or completed via a status field. Title MUST be non-empty after trimming whitespace. Date MUST be present. Sport MUST be one of Run, RoadRide, Swim, Strength, or Other. RoadRide means road cycling. Duration, when present, MUST be a whole number of minutes greater than zero. Distance, when present, MUST be a number of kilometers greater than zero.
 
 #### Scenario: Log activity with all fields
 
@@ -34,21 +34,21 @@ The system SHALL allow the user to record a completed activity with a date, a ti
 - **WHEN** they submit a date, a non-empty title, sport Run, duration 45 minutes, and distance 8 kilometers
 - **THEN** the activity is stored and appears in the list with those values
 
-#### Scenario: Log without sport, duration, or distance
+#### Scenario: Log without duration or distance
 
 - **GIVEN** the user is adding a completed activity
-- **WHEN** they submit a date and a non-empty title and leave sport, duration, and distance empty
-- **THEN** the activity is stored and appears in the list without those values
+- **WHEN** they submit a date, a non-empty title, and a sport, and leave duration and distance empty
+- **THEN** the activity is stored and appears in the list with that sport and without duration or distance
 
-#### Scenario: Reject invalid sport, duration, or distance
+#### Scenario: Reject missing or invalid sport, duration, or distance
 
 - **GIVEN** the user is adding a completed activity
-- **WHEN** they submit a sport outside the allowed set, a duration that is not a positive whole number of minutes, or a distance that is not a positive number of kilometers
+- **WHEN** they omit the sport, submit a sport outside the allowed set, a duration that is not a positive whole number of minutes, or a distance that is not a positive number of kilometers
 - **THEN** the activity is not stored and the user is shown what was rejected
 
 ### Requirement: User can view completed activities
 
-The system SHALL show stored completed activities in a list ordered by date descending (newest date first). Activities with the same date SHALL appear with the most recently added first. Each activity SHALL show its date, title, and notes when notes exist, and SHALL show sport, duration, and distance when those values exist.
+The system SHALL show stored completed activities in a list ordered by date descending (newest date first). Activities with the same date SHALL appear with the most recently added first. Each activity SHALL show its date, title, and sport, notes when notes exist, and duration and distance when those values exist.
 
 #### Scenario: Empty list
 
@@ -86,7 +86,7 @@ The system SHALL persist completed activities so they remain available after the
 
 ### Requirement: HTTP API for completed activities
 
-The system SHALL expose an HTTP JSON API that can list completed activities, create a completed activity, and update a completed activity. Create and update accept date, title, optional notes, optional sport, optional duration, and optional distance. Create and update MUST apply the same validation (non-empty title, date required, and the sport, duration, and distance rules). The API exists so a future native client can use the same contract.
+The system SHALL expose an HTTP JSON API that can list completed activities, create a completed activity, and update a completed activity. Create and update accept date, title, sport, optional notes, optional duration, and optional distance. Create and update MUST apply the same validation (non-empty title, date required, sport required, and the duration and distance rules). The API exists so a future native client can use the same contract.
 
 #### Scenario: Create via API
 
@@ -108,7 +108,7 @@ The system SHALL expose an HTTP JSON API that can list completed activities, cre
 
 #### Scenario: Reject invalid body via API
 
-- **GIVEN** a JSON body with a whitespace title, a sport outside the allowed set, a non-positive duration, or a non-positive distance
+- **GIVEN** a JSON body with a whitespace title, a missing sport, a sport outside the allowed set, a non-positive duration, or a non-positive distance
 - **WHEN** a client creates or updates a completed activity through the API
 - **THEN** the API responds with 400 and a text message, and the stored activities are unchanged
 
@@ -116,7 +116,7 @@ The system SHALL expose an HTTP JSON API that can list completed activities, cre
 
 ### Requirement: User can edit a saved completed activity
 
-The system SHALL allow the user to change the date, title, notes, sport, duration, and distance of a saved completed activity. Title and date rules MUST still apply. The user MUST be able to clear sport, duration, and distance. After a successful edit, the list SHALL show the updated values.
+The system SHALL allow the user to change the date, title, notes, sport, duration, and distance of a saved completed activity. Title, date, and sport rules MUST still apply. The user MUST be able to clear duration and distance. After a successful edit, the list SHALL show the updated values.
 
 #### Scenario: Edit saved fields
 
@@ -124,14 +124,14 @@ The system SHALL allow the user to change the date, title, notes, sport, duratio
 - **WHEN** the user changes its title, date, notes, sport, duration, and distance to valid values and saves
 - **THEN** the list shows the new values
 
-#### Scenario: Clear optional fields
+#### Scenario: Clear duration and distance
 
-- **GIVEN** a saved completed activity that has sport, duration, and distance
-- **WHEN** the user clears those three fields and saves
-- **THEN** the list shows the activity without sport, duration, or distance
+- **GIVEN** a saved completed activity that has duration and distance
+- **WHEN** the user clears those two fields and saves a valid sport
+- **THEN** the list shows the activity with its sport and without duration or distance
 
 #### Scenario: Reject invalid edit
 
 - **GIVEN** a saved completed activity
-- **WHEN** the user saves a whitespace title, a sport outside the allowed set, a non-positive duration, or a non-positive distance
+- **WHEN** the user saves a whitespace title, a missing sport, a sport outside the allowed set, a non-positive duration, or a non-positive distance
 - **THEN** the activity is unchanged and the user is shown what was rejected
